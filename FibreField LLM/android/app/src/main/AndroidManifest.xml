@@ -1,0 +1,260 @@
+<!-- 🟢 WORKING: Android manifest with all required permissions and configurations -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 🔐 REQUIRED PERMISSIONS FOR FIBREFIELD TECHNICIAN APP -->
+    
+    <!-- Camera permissions for photo capture -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
+
+    <!-- Location permissions for drop validation -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- Storage permissions for photo management -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"
+        tools:ignore="ScopedStorage" />
+    
+    <!-- Android 13+ photo permissions -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
+    <!-- Network permissions for API communication -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <!-- Device info permissions for security -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- Notification permissions (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Biometric authentication -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+
+    <!-- Wake lock for background processing -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Foreground service for location tracking -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
+    <!-- Vibration for feedback -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- 🏗️ HARDWARE REQUIREMENTS -->
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <!-- 📱 APPLICATION CONFIGURATION -->
+    <application
+        android:name=".FibreFieldApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.FibreField"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="false"
+        android:requestLegacyExternalStorage="true"
+        tools:targetApi="31">
+
+        <!-- 🏠 MAIN ACTIVITY -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.FibreField.Starting"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            
+            <!-- Deep link support for drop assignments -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                    android:host="fibreflow.com"
+                    android:pathPrefix="/technician" />
+            </intent-filter>
+        </activity>
+
+        <!-- 📸 CAMERA ACTIVITY FOR FULLSCREEN CAPTURE -->
+        <activity
+            android:name=".presentation.camera.FullscreenCameraActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FibreField.Fullscreen"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
+        <!-- 🔐 BIOMETRIC AUTHENTICATION ACTIVITY -->
+        <activity
+            android:name=".presentation.auth.BiometricAuthActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FibreField.Dialog"
+            android:excludeFromRecents="true" />
+
+        <!-- ⚙️ BACKGROUND SERVICES -->
+        
+        <!-- Location tracking service -->
+        <service
+            android:name=".infrastructure.location.LocationTrackingService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
+        <!-- Data synchronization service -->
+        <service
+            android:name=".infrastructure.sync.SyncService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!-- 🔄 WORK MANAGER WORKERS -->
+        
+        <!-- Photo validation worker -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+
+        <!-- 📡 BROADCAST RECEIVERS -->
+        
+        <!-- Network connectivity changes -->
+        <receiver
+            android:name=".infrastructure.sync.NetworkChangeReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Boot completed for service restoration -->
+        <receiver
+            android:name=".infrastructure.BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 📄 CONTENT PROVIDERS -->
+        
+        <!-- File provider for sharing photos -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
+
+        <!-- 🔧 APPLICATION COMPONENTS METADATA -->
+        
+        <!-- Hilt configuration -->
+        <meta-data
+            android:name="com.google.dagger.hilt.android.metadata.AggregatedDepsProcessorRootMetadata"
+            android:value="aggregated_deps" />
+
+        <!-- Work Manager configuration -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
+        <!-- Room database configuration -->
+        <meta-data
+            android:name="com.fibreflow.core.database.FibreFieldDatabase"
+            android:value="room_database" />
+
+        <!-- Firebase configuration -->
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="@bool/enable_analytics" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="@bool/enable_crash_reporting" />
+
+        <!-- Google Play Services version -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <!-- ML Kit models -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="barcode_scanning,text_recognition" />
+
+        <!-- 🌐 NETWORK SECURITY CONFIGURATION -->
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
+
+    </application>
+
+    <!-- 🔒 NETWORK SECURITY CONFIG -->
+    <network-security-config>
+        <domain-config cleartextTrafficPermitted="false">
+            <domain includeSubdomains="true">api.fibreflow.com</domain>
+            <domain includeSubdomains="true">fibreflow.com</domain>
+            <pin-set expiration="2025-12-31">
+                <pin digest="SHA-256">CERTIFICATE_PIN_PLACEHOLDER</pin>
+                <pin digest="SHA-256">BACKUP_CERTIFICATE_PIN_PLACEHOLDER</pin>
+            </pin-set>
+        </domain-config>
+    </network-security-config>
+
+    <!-- 📊 PERFORMANCE OPTIMIZATIONS -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    
+    <!-- Prevent app from being killed by system -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+</manifest>
