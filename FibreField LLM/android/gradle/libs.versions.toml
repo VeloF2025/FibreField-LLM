@@ -2,7 +2,7 @@
 [versions]
 # Core versions
 kotlin = "1.9.21"
-android-gradle-plugin = "8.2.2"
+android-gradle-plugin = "8.13.0"
 compose-bom = "2024.02.00"
 compose-compiler = "1.5.8"
 
