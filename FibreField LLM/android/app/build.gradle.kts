@@ -39,11 +39,24 @@ android {
     
     signingConfigs {
         create("release") {
-            // In production, these would come from environment variables or secure storage
-            keyAlias = findProperty("KEY_ALIAS") as String? ?: "release_key"
-            keyPassword = findProperty("KEY_PASSWORD") as String? ?: "release_password"
+            // Use environment variables or command line properties for production
+            // These should be set in CI/CD environment or local.properties
+            keyAlias = findProperty("KEY_ALIAS") as String?
+            keyPassword = findProperty("KEY_PASSWORD") as String?
             storeFile = file("keystore/release.keystore")
-            storePassword = findProperty("KEYSTORE_PASSWORD") as String? ?: "keystore_password"
+            storePassword = findProperty("KEYSTORE_PASSWORD") as String?
+            
+            // Validate that required properties are set for release builds
+            if (keyAlias == null || keyPassword == null || storePassword == null) {
+                throw GradleException("Missing required signing properties. Set KEY_ALIAS, KEY_PASSWORD, and KEYSTORE_PASSWORD as environment variables or in local.properties")
+            }
+        }
+        
+        create("debug") {
+            storeFile = file("keystore/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
         }
     }
     

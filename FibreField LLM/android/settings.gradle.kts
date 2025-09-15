@@ -27,6 +27,7 @@ include(":core:database")
 include(":core:network")
 include(":core:ai")
 include(":core:design")
+include(":core:performance")
 
 // Domain modules - business logic
 include(":domain:authentication")
@@ -46,3 +47,4 @@ include(":feature:remediation")
 include(":infrastructure:sync")
 include(":infrastructure:location")
 include(":infrastructure:security")
+include(":infrastructure:offline")

@@ -5,6 +5,8 @@ import com.fibreflow.core.common.result.Result
 import com.fibreflow.core.database.entities.InstallationEntity
 import com.fibreflow.core.database.entities.PhotoEntity
 import com.fibreflow.core.database.entities.DropEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -199,6 +201,34 @@ class ConflictResolver @Inject constructor() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to merge conflicting data", e)
+            Result.Error(e)
+        }
+    }
+
+    /**
+     * Resolve sync change conflict
+     */
+    suspend fun resolveChangeConflict(
+        conflict: com.fibreflow.infrastructure.sync.SyncConflict
+    ): Result<com.fibreflow.infrastructure.sync.SyncChange> = withContext(Dispatchers.Default) {
+        try {
+            Log.d(TAG, "Resolving sync change conflict for entity: ${conflict.entityType} ${conflict.entityId}")
+            
+            // For sync changes, we typically use timestamp-based resolution
+            val localChange = conflict.localData as com.fibreflow.infrastructure.sync.SyncChange
+            val remoteChange = conflict.remoteData as com.fibreflow.infrastructure.sync.SyncChange
+            
+            val resolvedChange = if (localChange.timestamp > remoteChange.timestamp) {
+                localChange
+            } else {
+                remoteChange
+            }
+            
+            Log.d(TAG, "Sync change conflict resolved using timestamp comparison")
+            Result.Success(resolvedChange)
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to resolve sync change conflict", e)
             Result.Error(e)
         }
     }
