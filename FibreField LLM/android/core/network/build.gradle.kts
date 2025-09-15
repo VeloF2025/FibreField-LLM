@@ -33,12 +33,9 @@ dependencies {
 
     // Network
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
-
-    // Security
-    implementation(libs.okhttp.certificate.pinner)
 
     // Utilities
     implementation(libs.timber)
@@ -52,5 +49,6 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.truth)
     testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.okhttp.mockwebserver)
+    // TODO: Add mockwebserver dependency to version catalog if needed
+    // testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 }

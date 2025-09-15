@@ -2,8 +2,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
 }
@@ -52,7 +52,7 @@ android {
             }
         }
         
-        create("debug") {
+        getByName("debug") {
             storeFile = file("keystore/debug.keystore")
             storePassword = "android"
             keyAlias = "androiddebugkey"
@@ -145,26 +145,17 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:network"))
     implementation(project(":core:ai"))
-    implementation(project(":core:design"))
-    
+
     // Domain modules
     implementation(project(":domain:authentication"))
-    implementation(project(":domain:installation"))
     implementation(project(":domain:drops"))
-    implementation(project(":domain:activation"))
-    implementation(project(":domain:remediation"))
-    
+
     // Feature modules
-    implementation(project(":feature:authentication"))
     implementation(project(":feature:installation"))
-    implementation(project(":feature:drops"))
-    implementation(project(":feature:activation"))
-    implementation(project(":feature:remediation"))
-    
+
     // Infrastructure modules
     implementation(project(":infrastructure:sync"))
-    implementation(project(":infrastructure:location"))
-    implementation(project(":infrastructure:security"))
+    implementation(project(":infrastructure:offline"))
     
     // Core Android libraries
     implementation(libs.androidx.core.ktx)

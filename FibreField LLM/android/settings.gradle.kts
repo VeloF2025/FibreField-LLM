@@ -26,25 +26,14 @@ include(":core:common")
 include(":core:database")
 include(":core:network")
 include(":core:ai")
-include(":core:design")
-include(":core:performance")
 
 // Domain modules - business logic
 include(":domain:authentication")
-include(":domain:installation")
 include(":domain:drops")
-include(":domain:activation")
-include(":domain:remediation")
 
 // Feature modules - UI and presentation
-include(":feature:authentication")
 include(":feature:installation")
-include(":feature:drops")
-include(":feature:activation")
-include(":feature:remediation")
 
 // Infrastructure modules - system services
 include(":infrastructure:sync")
-include(":infrastructure:location")
-include(":infrastructure:security")
 include(":infrastructure:offline")

@@ -26,9 +26,8 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     // ML Kit for computer vision
-    implementation(libs.mlkit.vision.common)
-    implementation(libs.mlkit.vision.barcode.scanning)
-    implementation(libs.mlkit.vision.text.recognition)
+    implementation(libs.mlkit.text.recognition)
+    implementation(libs.mlkit.barcode.scanning)
 
     // TensorFlow Lite for custom models
     implementation(libs.tensorflow.lite)
