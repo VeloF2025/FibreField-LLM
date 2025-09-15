@@ -63,13 +63,14 @@ android {
     buildTypes {
         debug {
             isMinifyEnabled = false
+            isShrinkResources = false
             isDebuggable = true
             applicationIdSuffix = ".debug"
-            
+
             // Debug-specific configuration
             buildConfigField("String", "API_BASE_URL", "\"${findProperty("DEBUG_API_BASE_URL")}\"")
             buildConfigField("String", "CERTIFICATE_PIN", "\"${findProperty("CERTIFICATE_PIN_DEV")}\"")
-            
+
             // Enable all debugging features
             buildConfigField("boolean", "ENABLE_ANALYTICS", "false")
             buildConfigField("boolean", "ENABLE_CRASH_REPORTING", "false")
